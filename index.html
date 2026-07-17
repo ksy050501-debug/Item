@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>메이플 템세팅 성장 가이드</title>
+  <style>
+    :root {
+      --bg: #f2f4f8;
+      --panel: #ffffff;
+      --line: #dde1ea;
+      --text: #202433;
+      --muted: #73798b;
+      --purple: #6653cf;
+      --purple-soft: #eeeaff;
+      --success: #1e9d65;
+      --danger: #d94e59;
+      --shadow: 0 12px 34px rgba(35, 40, 70, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 0 0, rgba(102, 83, 207, .13), transparent 28%),
+        radial-gradient(circle at 100% 0, rgba(30, 157, 101, .10), transparent 23%),
+        var(--bg);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      width: min(1480px, calc(100% - 30px));
+      margin: 0 auto;
+      padding: 26px 0 60px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 3vw, 42px);
+      letter-spacing: -.045em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .reset-btn {
+      border: 1px solid #f0c9cd;
+      background: #fff;
+      color: var(--danger);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .mode-panel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .mode-toggle {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 17px;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(35, 40, 70, .045);
+      transition: .18s ease;
+    }
+
+    .mode-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(35, 40, 70, .08);
+    }
+
+    .mode-toggle.active {
+      border-color: rgba(102, 83, 207, .42);
+      background: linear-gradient(135deg, #fff, #f3f0ff);
+    }
+
+    .switch {
+      width: 46px;
+      height: 26px;
+      flex: 0 0 46px;
+      padding: 3px;
+      border-radius: 999px;
+      background: #c9cdd7;
+      transition: .2s ease;
+    }
+
+    .switch::after {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 7px rgba(0, 0, 0, .16);
+      transition: .2s ease;
+    }
+
+    .mode-toggle.active .switch {
+      background: var(--purple);
+    }
+
+    .mode-toggle.active .switch::after {
+      transform: translateX(20px);
+    }
+
+    .mode-copy strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .mode-copy span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-card {
+      min-height: 136px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card.main {
+      border: 0;
+      color: #fff;
+      background: linear-gradient(135deg, #5e49c8, #8d75ee);
+    }
+
+    .summary-label {
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 900;
+      opacity: .76;
+    }
+
+    .summary-value {
+      margin-bottom: 8px;
+      font-size: 32px;
+      font-weight: 950;
+      letter-spacing: -.04em;
+    }
+
+    .summary-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .summary-card.main .summary-desc {
+      color: rgba(255,255,255,.78);
+    }
+
+    .progress-track {
+      height: 10px;
+      margin-top: 14px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,.2);
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: #fff;
+      transition: width .25s ease;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 8px;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 25px rgba(35, 40, 70, .07);
+    }
+
+    .filters {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      padding: 9px 12px;
+      color: var(--muted);
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .filter-btn.active {
+      color: var(--purple);
+      background: var(--purple-soft);
+    }
+
+    .toolbar-hint {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section.special {
+      margin-top: 34px;
+      padding-top: 20px;
+      border-top: 2px dashed #d5d9e4;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -.035em;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .equipment-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .equipment-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+      box-shadow: 0 6px 18px rgba(35, 40, 70, .045);
+      transition: .18s ease;
+    }
+
+    .equipment-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(35, 40, 70, .075);
+    }
+
+    .equipment-card.complete {
+      border-color: rgba(30, 157, 101, .35);
+    }
+
+    .equipment-card.locked {
+      background: linear-gradient(135deg, #fff, #f6f5fb);
+    }
+
+    .equipment-top {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .equipment-name {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .equipment-icon {
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--purple-soft);
+      font-size: 22px;
+    }
+
+    .equipment-name strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 16px;
+    }
+
+    .equipment-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .equipment-title-row strong {
+      margin-bottom: 0;
+    }
+
+    .ring-options {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ring-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 7px;
+      border: 1px solid #d9dce6;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #f8f9fc;
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+      transition: .16s ease;
+    }
+
+    .ring-option:hover {
+      border-color: #bbb3e6;
+      background: #f3f0ff;
+    }
+
+    .ring-option.active {
+      border-color: rgba(102, 83, 207, .42);
+      color: #5844bf;
+      background: #eeeaff;
+    }
+
+    .ring-option input {
+      width: 13px;
+      height: 13px;
+      margin: 0;
+      accent-color: var(--purple);
+      cursor: pointer;
+    }
+
+    .criteria-grid.ring-event {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .criteria-grid.ring-seed {
+      grid-template-columns: 1fr;
+    }
+
+    .seed-level-panel {
+      min-height: 128px;
+      padding: 14px;
+      border: 1px solid rgba(102, 83, 207, .34);
+      border-radius: 15px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.72), transparent 42%),
+        linear-gradient(145deg, #f1edff, #d8d0ff);
+      box-shadow: inset 0 1px rgba(255,255,255,.8);
+    }
+
+    .seed-level-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #6656a9;
+      font-size: 11px;
+      font-weight: 950;
+    }
+
+    .seed-level-current {
+      display: block;
+      margin-bottom: 12px;
+      color: #392b78;
+      font-size: 23px;
+      font-weight: 950;
+      letter-spacing: -.035em;
+    }
+
+    .seed-level-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .seed-level-btn {
+      border: 1px solid rgba(102, 83, 207, .25);
+      border-radius: 10px;
+      padding: 9px 5px;
+      color: #6656a9;
+      background: rgba(255,255,255,.64);
+      font-size: 12px;
+      font-weight: 950;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+
+    .seed-level-btn:hover {
+      transform: translateY(-1px);
+      background: #fff;
+    }
+
+    .seed-level-btn.active {
+      border-color: #6653cf;
+      color: #fff;
+      background: #6653cf;
+      box-shadow: 0 5px 12px rgba(102, 83, 207, .22);
+    }
+
+    .equipment-meta {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .lock-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 4px 7px;
+      border-radius: 999px;
+      color: #5948b6;
+      background: #ece8ff;
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .criterion {
+      position: relative;
+      min-height: 114px;
+      overflow: hidden;
+      padding: 11px 10px 10px;
+      border: 1px solid rgba(90, 96, 115, .24);
+      border-radius: 14px;
+      cursor: pointer;
+      user-select: none;
+      transition: .18s ease;
+      box-shadow: inset 0 1px rgba(255,255,255,.5);
+    }
+
+    .criterion:hover:not(.locked):not(.na) {
+      transform: translateY(-1px);
+      filter: brightness(1.025);
+    }
+
+    .criterion.na {
+      cursor: default;
+      color: #979baa;
+      background: #f1f2f5;
+      opacity: .62;
+    }
+
+    .criterion.locked {
+      cursor: default;
+    }
+
+    .tier-iron {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.35), transparent 42%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.07) 0 2px, rgba(0,0,0,.02) 2px 5px),
+        linear-gradient(145deg, #d3d5d7, #9da1a5);
+      color: #262a2d;
+    }
+
+    .tier-bronze {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.33), transparent 42%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.07) 0 2px, rgba(0,0,0,.025) 2px 5px),
+        linear-gradient(145deg, #dca66f, #a86839);
+      color: #2f1b10;
+    }
+
+    .tier-silver {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.65), transparent 40%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.12) 0 2px, rgba(0,0,0,.025) 2px 5px),
+        linear-gradient(145deg, #f3f5f7, #adb5bf);
+      color: #232933;
+    }
+
+    .tier-gold {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.55), transparent 42%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.11) 0 2px, rgba(0,0,0,.025) 2px 5px),
+        linear-gradient(145deg, #f7dc70, #c89927);
+      color: #332500;
+    }
+
+    .tier-diamond {
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.8), transparent 38%),
+        linear-gradient(45deg, rgba(122,233,255,.27), transparent 45%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.18) 0 2px, rgba(58,156,182,.035) 2px 5px),
+        linear-gradient(145deg, #e8fbff, #93dbe9 52%, #b5a9f5);
+      color: #163843;
+      border-color: rgba(53, 174, 202, .55);
+      box-shadow: 0 6px 16px rgba(59, 173, 204, .16), inset 0 1px rgba(255,255,255,.85);
+    }
+
+    .criterion-type {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 11px;
+      font-weight: 950;
+      opacity: .72;
+    }
+
+    .goal-label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 10px;
+      font-weight: 900;
+      opacity: .66;
+    }
+
+    .goal-main {
+      display: block;
+      padding-right: 18px;
+      font-size: 19px;
+      font-weight: 950;
+      line-height: 1.22;
+      letter-spacing: -.025em;
+      word-break: keep-all;
+    }
+
+    .achieved {
+      display: block;
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px solid rgba(35, 40, 50, .14);
+      font-size: 11px;
+      font-weight: 850;
+      opacity: .76;
+      line-height: 1.4;
+    }
+
+    .stage-dots {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 9px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .stage-dot {
+      height: 5px;
+      flex: 1;
+      border-radius: 999px;
+      background: rgba(30, 34, 45, .16);
+    }
+
+    .stage-dot.done {
+      background: rgba(25, 31, 43, .64);
+    }
+
+    .tier-diamond .stage-dot.done {
+      background: #1a879f;
+    }
+
+    .undo {
+      position: absolute;
+      right: 7px;
+      bottom: 19px;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 7px;
+      color: rgba(28, 32, 42, .68);
+      background: rgba(255,255,255,.38);
+      cursor: pointer;
+      font-weight: 950;
+      opacity: 0;
+      transition: .15s ease;
+    }
+
+    .criterion:hover .undo {
+      opacity: 1;
+    }
+
+    .criterion.locked .undo,
+    .criterion.na .undo {
+      display: none;
+    }
+
+    .burning-status {
+      position: relative;
+      min-height: 114px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(174, 123, 14, .55);
+      border-radius: 15px;
+      color: #352500;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.62), transparent 40%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.12) 0 2px, rgba(103,69,0,.035) 2px 5px),
+        linear-gradient(145deg, #ffe889, #d4a62f 58%, #b98516);
+      box-shadow:
+        0 8px 20px rgba(190, 139, 22, .18),
+        inset 0 1px rgba(255,255,255,.7);
+      cursor: default;
+      user-select: none;
+    }
+
+    .burning-status::before {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      right: -70px;
+      top: -90px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+    }
+
+    .burning-symbol {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(100,68,0,.22);
+      border-radius: 14px;
+      background: rgba(255,255,255,.28);
+      font-size: 25px;
+      box-shadow: inset 0 1px rgba(255,255,255,.48);
+    }
+
+    .burning-copy {
+      position: relative;
+      z-index: 1;
+    }
+
+    .burning-copy strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 18px;
+      font-weight: 950;
+      letter-spacing: -.025em;
+    }
+
+    .burning-copy span {
+      display: block;
+      color: rgba(53,37,0,.72);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+
+    .pidomi-status {
+      grid-column: span 4;
+      min-height: 114px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid rgba(174, 123, 14, .55);
+      border-radius: 14px;
+      color: #352500;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.62), transparent 40%),
+        repeating-linear-gradient(120deg, rgba(255,255,255,.12) 0 2px, rgba(103,69,0,.035) 2px 5px),
+        linear-gradient(145deg, #ffe889, #d4a62f 58%, #b98516);
+      box-shadow:
+        0 7px 18px rgba(190, 139, 22, .16),
+        inset 0 1px rgba(255,255,255,.7);
+      cursor: default;
+      user-select: none;
+    }
+
+    .pidomi-status .burning-copy strong {
+      font-size: 17px;
+    }
+
+    .additional-help {
+      margin-top: 7px;
+      padding: 10px 12px;
+      border: 1px solid #dfe2eb;
+      border-radius: 13px;
+      color: var(--muted);
+      background: #fafbfe;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .additional-help strong {
+      color: var(--text);
+    }
+
+    .empty {
+      display: none;
+      padding: 55px 18px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 18px;
+      background: var(--panel);
+    }
+
+    .guide {
+      margin-top: 28px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      color: var(--muted);
+      background: var(--panel);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 99;
+      padding: 11px 16px;
+      border-radius: 12px;
+      color: #fff;
+      background: #202433;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 16px);
+      transition: .2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 1060px) {
+      .dashboard { grid-template-columns: 1fr 1fr; }
+      .summary-card.main { grid-column: 1 / -1; }
+      .equipment-top { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 760px) {
+      .app { width: min(100% - 18px, 1480px); padding-top: 17px; }
+      .pidomi-status { grid-column: 1 / -1; }
+      .hero { flex-direction: column; }
+      .mode-panel { grid-template-columns: 1fr; }
+      .dashboard { grid-template-columns: 1fr; }
+      .summary-card.main { grid-column: auto; }
+      .criteria-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (max-width: 440px) {
+      .criteria-grid { grid-template-columns: 1fr; }
+      .criteria-grid.ring-event { grid-template-columns: 1fr; }
+      .seed-level-buttons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div>
+        <h1>메이플 템세팅 성장 가이드</h1>
+        <p class="subtitle">상자를 클릭하면 달성 단계가 올라가고, 다음 목표가 자동으로 열립니다.</p>
+      </div>
+      <button class="reset-btn" id="resetBtn">전체 초기화</button>
+    </header>
+
+    <section class="mode-panel" aria-label="특수 장비 설정">
+      <button class="mode-toggle" id="itemBurningToggle" type="button">
+        <span class="switch"></span>
+        <span class="mode-copy">
+          <strong>아이템 버닝</strong>
+          <span>도전자 무기·방어구를 고정 처리하고 맨 아래로 이동</span>
+        </span>
+      </button>
+
+      <button class="mode-toggle" id="liberationToggle" type="button">
+        <span class="switch"></span>
+        <span class="mode-copy">
+          <strong>해방무기 보유</strong>
+          <span>도전자 무기 슬롯을 해방무기로 변경</span>
+        </span>
+      </button>
+
+      <button class="mode-toggle active" id="pidomiToggle" type="button">
+        <span class="switch"></span>
+        <span class="mode-copy">
+          <strong>피도미 사용</strong>
+          <span>펜던트 한 칸을 피도미로 완료 처리</span>
+        </span>
+      </button>
+    </section>
+
+    <section class="dashboard">
+      <article class="summary-card main">
+        <div class="summary-label">전체 성장 진행률</div>
+        <div class="summary-value" id="overallPercent">0%</div>
+        <div class="summary-desc" id="overallDesc">첫 목표를 달성해 보세요.</div>
+        <div class="progress-track"><div class="progress-fill" id="overallBar"></div></div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-label">완료 단계</div>
+        <div class="summary-value" id="milestoneCount">0 / 0</div>
+        <div class="summary-desc">각 상자의 세부 목표까지 포함한 누적 단계입니다.</div>
+      </article>
+
+      <article class="summary-card">
+        <div class="summary-label">다음 추천 목표</div>
+        <div class="summary-value" id="nextItem" style="font-size:22px;">-</div>
+        <div class="summary-desc" id="nextGoal">목표를 확인해 주세요.</div>
+      </article>
+    </section>
+
+    <nav class="toolbar">
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">전체</button>
+        <button class="filter-btn" data-filter="incomplete">미완료 부위</button>
+        <button class="filter-btn" data-filter="complete">최종 완료 부위</button>
+      </div>
+      <div class="toolbar-hint">상자 클릭: 다음 단계 · 상자 안 ↶: 한 단계 되돌리기</div>
+    </nav>
+
+    <div id="sections"></div>
+    <div class="empty" id="emptyState">선택한 조건에 해당하는 장비가 없습니다.</div>
+
+    <aside class="guide">
+      <strong>에디셔널 잠재 줄 수 기준</strong><br>
+      <strong>공격력·마력 10</strong> = 1줄 ·
+      <strong>주스탯 4%</strong> = 1줄 ·
+      <strong>주스탯 2%</strong> = 0.5줄<br>
+      무기·보조무기·엠블렘은 줄 수 대신 공격력% 단계로 표시합니다.
+    </aside>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const CRITERIA = [
+      { key: "star", label: "스타포스", stages: ["17성", "18성", "20성", "22성"] },
+      { key: "flame", label: "추옵", stages: ["90급", "100급", "120급", "150급"] },
+      { key: "potential", label: "잠재", stages: ["9%", "15%", "21%"] },
+      { key: "additional", label: "에디잠재", stages: ["1줄", "1.5줄", "2줄"] },
+      { key: "scroll", label: "주문서 강화", stages: [] }
+    ];
+
+    const WSE_IDS = ["weapon", "secondary", "emblem"];
+    const WSE_POTENTIAL_STAGES = ["에픽 2줄", "유니크 2줄", "레전드 2줄", "레전드 3줄"];
+    const WSE_ADDITIONAL_STAGES = ["공 3%", "공 6%", "공 9%", "공 12%"];
+    const WEAPON_SCROLL_STAGES = ["70퍼작", "30퍼작", "15퍼작"];
+    const ACCESSORY_SCROLL_STAGES = ["주흔작", "놀긍떡작", "프악공작"];
+    const HEART_SCROLL_STAGES = ["주흔30퍼작", "스페셜하트주문서작"];
+    const HEART_STAR_STAGES = ["17성", "18성", "20성"];
+    const SEED_LEVEL_STAGES = ["1레벨", "2레벨", "3레벨", "4레벨"];
+    const SEED_CRITERION = { key: "seedLevel", label: "시드링 레벨", stages: SEED_LEVEL_STAGES };
+    const RING_IDS = ["ring1", "ring2", "ring3", "ring4"];
+    const ACCESSORY_SCROLL_IDS = [
+      "face", "eye", "earring", "belt",
+      "pendant1", "pendant2",
+      "ring1", "ring2", "ring3", "ring4"
+    ];
+
+    const EQUIPMENT_DATA = [
+      {
+        category: "무보엠",
+        items: [
+          { id: "weapon", name: "도전자 무기", icon: "⚔️", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "secondary", name: "보조무기", icon: "🛡️", applies: ["potential", "additional"] },
+          { id: "emblem", name: "엠블렘", icon: "🔰", applies: ["potential", "additional"] }
+        ]
+      },
+      {
+        category: "방어구",
+        items: [
+          { id: "hat", name: "모자", icon: "🎩", applies: ["star", "flame", "potential", "additional"] },
+          { id: "top", name: "상의", icon: "👕", applies: ["star", "flame", "potential", "additional"] },
+          { id: "bottom", name: "하의", icon: "👖", applies: ["star", "flame", "potential", "additional"] },
+          { id: "shoulder", name: "어깨장식", icon: "🦾", applies: ["star", "potential", "additional"] },
+          { id: "gloves", name: "장갑", icon: "🧤", applies: ["star", "flame", "potential", "additional"] },
+          { id: "cape", name: "망토", icon: "🧣", applies: ["star", "flame", "potential", "additional"] },
+          { id: "shoes", name: "신발", icon: "🥾", applies: ["star", "flame", "potential", "additional"] }
+        ]
+      },
+      {
+        category: "장신구",
+        items: [
+          { id: "face", name: "얼굴장식", icon: "🎭", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "eye", name: "눈장식", icon: "👓", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "earring", name: "귀고리", icon: "💎", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "belt", name: "벨트", icon: "📿", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "pendant1", name: "펜던트 1", icon: "🔷", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "pendant2", name: "펜던트 2", icon: "🔶", applies: ["star", "flame", "potential", "additional", "scroll"] },
+          { id: "pocket", name: "포켓 아이템", icon: "🧿", applies: ["flame"] },
+          { id: "ring1", name: "반지 1", icon: "💍", applies: ["star", "potential", "additional", "scroll"] },
+          { id: "ring2", name: "반지 2", icon: "💍", applies: ["star", "potential", "additional", "scroll"] },
+          { id: "ring3", name: "반지 3", icon: "💍", applies: ["star", "potential", "additional", "scroll"] },
+          { id: "ring4", name: "반지 4", icon: "💍", applies: ["star", "potential", "additional", "scroll"] }
+        ]
+      },
+      {
+        category: "기타",
+        items: [
+          { id: "heart", name: "기계 심장", icon: "❤️", applies: ["star", "potential", "additional", "scroll"] }
+        ]
+      }
+    ];
+
+    const ITEM_BURNING_IDS = ["weapon", "hat", "top", "bottom", "shoulder", "gloves", "cape", "shoes"];
+    const STORAGE_KEY = "mapleGearGrowthGuide";
+    const LEGACY_STORAGE_KEYS = [
+      "mapleGearGrowthGuide_v7",
+      "mapleGearGrowthGuide_v6",
+      "mapleGearGrowthGuide_v2",
+      "mapleGearGuide_v1"
+    ];
+    const TIER_NAMES = ["아이언", "브론즈", "실버", "골드", "다이아"];
+    const TIER_CLASSES = ["tier-iron", "tier-bronze", "tier-silver", "tier-gold", "tier-diamond"];
+
+    let currentFilter = "all";
+    const state = loadState();
+    enforceLockedModes();
+
+    function makeBlankItemProgress(itemId) {
+      const item = findItem(itemId);
+      const obj = {};
+      item.applies.forEach(key => obj[key] = 0);
+      return obj;
+    }
+
+    function defaultState() {
+      return {
+        settings: {
+          itemBurning: false,
+          liberated: false,
+          pidomi: true
+        },
+        progress: {},
+        ringModes: {
+          ring1: "normal",
+          ring2: "normal",
+          ring3: "normal",
+          ring4: "normal"
+        },
+        backups: {
+          itemBurning: {},
+          pidomi: { pendant2: makeBlankItemProgress("pendant2") }
+        }
+      };
+    }
+
+    function migratePotentialProgress(progress, sourceKey) {
+      if (!progress || sourceKey !== "mapleGearGrowthGuide_v6") return progress || {};
+
+      const migrated = JSON.parse(JSON.stringify(progress));
+      const wseIds = new Set(["weapon", "liberatedWeapon", "secondary", "emblem"]);
+
+      Object.entries(migrated).forEach(([itemId, values]) => {
+        if (!values || wseIds.has(itemId) || typeof values.potential !== "number") return;
+
+        // v6 일반 장비 잠재: 0, 9%, 12%, 15%, 21%
+        // v8 일반 장비 잠재: 0, 9%, 15%, 21%
+        const oldValue = values.potential;
+        values.potential =
+          oldValue <= 1 ? oldValue :
+          oldValue === 2 ? 1 :
+          oldValue === 3 ? 2 : 3;
+      });
+
+      return migrated;
+    }
+
+    function normalizeState(parsed, sourceKey) {
+      return {
+        settings: {
+          itemBurning: Boolean(parsed.settings?.itemBurning),
+          liberated: Boolean(parsed.settings?.liberated),
+          pidomi: parsed.settings?.pidomi !== false
+        },
+        progress: migratePotentialProgress(parsed.progress || {}, sourceKey),
+        ringModes: {
+          ring1: parsed.ringModes?.ring1 || "normal",
+          ring2: parsed.ringModes?.ring2 || "normal",
+          ring3: parsed.ringModes?.ring3 || "normal",
+          ring4: parsed.ringModes?.ring4 || "normal"
+        },
+        backups: {
+          itemBurning: parsed.backups?.itemBurning || {},
+          pidomi: parsed.backups?.pidomi || { pendant2: makeBlankItemProgress("pendant2") }
+        }
+      };
+    }
+
+    function loadState() {
+      const candidateKeys = [STORAGE_KEY, ...LEGACY_STORAGE_KEYS];
+
+      for (const key of candidateKeys) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+
+          const parsed = JSON.parse(raw);
+          const loaded = normalizeState(parsed, key);
+
+          // 이전 버전 키에서 불러온 경우 영구 저장 키로 즉시 이전
+          if (key !== STORAGE_KEY) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(loaded));
+          }
+
+          return loaded;
+        } catch {
+          // 손상된 저장값은 건너뛰고 다음 키를 확인
+        }
+      }
+
+      return defaultState();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function allItems() {
+      return EQUIPMENT_DATA.flatMap(section =>
+        section.items.map(item => ({ ...item, category: section.category }))
+      );
+    }
+
+    function findItem(id) {
+      return EQUIPMENT_DATA.flatMap(section => section.items).find(item => item.id === id);
+    }
+
+    function criterionByKey(key) {
+      if (key === "seedLevel") return SEED_CRITERION;
+      return CRITERIA.find(c => c.key === key);
+    }
+
+    function isRing(itemId) {
+      return RING_IDS.includes(itemId);
+    }
+
+    function ringMode(itemId) {
+      return isRing(itemId) ? (state.ringModes?.[itemId] || "normal") : "normal";
+    }
+
+    function setRingMode(itemId, mode) {
+      if (!isRing(itemId)) return;
+      state.ringModes ||= {};
+      state.ringModes[itemId] = mode;
+    }
+
+    function stagesFor(itemId, key) {
+      if (key === "seedLevel") {
+        return SEED_LEVEL_STAGES;
+      }
+      if (itemId === "heart" && key === "star") {
+        return HEART_STAR_STAGES;
+      }
+      if (WSE_IDS.includes(itemId) && key === "potential") {
+        return WSE_POTENTIAL_STAGES;
+      }
+      if (WSE_IDS.includes(itemId) && key === "additional") {
+        return WSE_ADDITIONAL_STAGES;
+      }
+      if (itemId === "weapon" && key === "scroll") {
+        return WEAPON_SCROLL_STAGES;
+      }
+      if (ACCESSORY_SCROLL_IDS.includes(itemId) && key === "scroll") {
+        return ACCESSORY_SCROLL_STAGES;
+      }
+      if (itemId === "heart" && key === "scroll") {
+        return HEART_SCROLL_STAGES;
+      }
+      return criterionByKey(key).stages;
+    }
+
+    function activeApplies(item) {
+      if (item.id === "pendant2" && state.settings.pidomi) {
+        return ["flame"];
+      }
+
+      if (isRing(item.id)) {
+        const mode = ringMode(item.id);
+        if (mode === "event") return ["potential", "additional"];
+        if (mode === "seed") return ["seedLevel"];
+      }
+
+      return item.applies;
+    }
+
+    function progressStorageId(itemId) {
+      if (itemId === "weapon" && state.settings.liberated) {
+        return "liberatedWeapon";
+      }
+      if (itemId === "pendant2" && state.settings.pidomi) {
+        return "pidomiPendant";
+      }
+      return itemId;
+    }
+
+    function getStoredProgress(storageId, key) {
+      return Number(state.progress[storageId]?.[key] || 0);
+    }
+
+    function setStoredProgress(storageId, itemId, key, value) {
+      const max = stagesFor(itemId, key).length;
+      state.progress[storageId] ||= {};
+      state.progress[storageId][key] = Math.max(0, Math.min(max, value));
+    }
+
+    function getProgress(itemId, key) {
+      const stored = getStoredProgress(progressStorageId(itemId), key);
+      return Math.min(stored, stagesFor(itemId, key).length);
+    }
+
+    function setProgress(itemId, key, value) {
+      setStoredProgress(progressStorageId(itemId), itemId, key, value);
+    }
+
+    function snapshotItem(itemId, forceChallenger = false) {
+      const item = findItem(itemId);
+      const storageId = forceChallenger && itemId === "weapon"
+        ? "weapon"
+        : progressStorageId(itemId);
+      const snapshot = {};
+      item.applies.forEach(key => snapshot[key] = getStoredProgress(storageId, key));
+      return snapshot;
+    }
+
+    function restoreItem(itemId, snapshot, forceChallenger = false) {
+      const item = findItem(itemId);
+      const storageId = forceChallenger && itemId === "weapon"
+        ? "weapon"
+        : progressStorageId(itemId);
+      item.applies.forEach(key =>
+        setStoredProgress(storageId, itemId, key, Number(snapshot?.[key] || 0))
+      );
+    }
+
+    function completeItem(itemId, forceChallenger = false) {
+      const item = findItem(itemId);
+      const storageId = forceChallenger && itemId === "weapon"
+        ? "weapon"
+        : progressStorageId(itemId);
+      item.applies.forEach(key =>
+        setStoredProgress(storageId, itemId, key, stagesFor(itemId, key).length)
+      );
+    }
+
+    function isItemLocked(itemId) {
+      if (
+        ITEM_BURNING_IDS.includes(itemId) &&
+        state.settings.itemBurning &&
+        !(itemId === "weapon" && state.settings.liberated)
+      ) {
+        return { locked: true, reason: "아이템 버닝 적용" };
+      }
+      return { locked: false, reason: "" };
+    }
+
+    function enforceLockedModes() {
+      if (state.settings.itemBurning) {
+        ITEM_BURNING_IDS.forEach(id => completeItem(id, id === "weapon"));
+      }
+      saveState();
+    }
+
+    function itemStats(item) {
+      let done = 0;
+      let total = 0;
+      activeApplies(item).forEach(key => {
+        done += getProgress(item.id, key);
+        total += stagesFor(item.id, key).length;
+      });
+      return {
+        done,
+        total,
+        complete: total > 0 && done === total
+      };
+    }
+
+    function displayName(item) {
+      if (item.id === "weapon" && state.settings.liberated) return "해방무기";
+      if (item.id === "pendant2" && state.settings.pidomi) return "피도미";
+      if (ITEM_BURNING_IDS.includes(item.id) && isItemLocked(item.id).locked) {
+        return item.id === "weapon" ? "도전자 무기" : `도전자 ${item.name}`;
+      }
+      return item.name;
+    }
+
+    function displayIcon(item) {
+      if (item.id === "weapon" && state.settings.liberated) return "✨";
+      if (item.id === "pendant2" && state.settings.pidomi) return "🟣";
+      return item.icon;
+    }
+
+    function tierIndex(progress, total) {
+      if (progress <= 0) return 0;
+      if (progress >= total) return 4;
+      if (total === 4) return progress;
+      return Math.max(1, Math.min(3, Math.round((progress / total) * 4)));
+    }
+
+    function criterionText(stages, progress) {
+      const total = stages.length;
+
+      if (progress <= 0) {
+        return {
+          label: "현재 상태",
+          main: "미달성",
+          achieved: `다음 목표 · ${stages[0]}`
+        };
+      }
+
+      if (progress >= total) {
+        return {
+          label: "현재 상태",
+          main: stages[total - 1],
+          achieved: "최종 목표 달성"
+        };
+      }
+
+      return {
+        label: "현재 상태",
+        main: stages[progress - 1],
+        achieved: `다음 목표 · ${stages[progress]}`
+      };
+    }
+
+    function shouldShow(item) {
+      const stats = itemStats(item);
+      if (currentFilter === "complete") return stats.complete;
+      if (currentFilter === "incomplete") return !stats.complete;
+      return true;
+    }
+
+    function render() {
+      renderToggles();
+      const container = document.getElementById("sections");
+      container.innerHTML = "";
+      let count = 0;
+
+      const specialItems = [];
+
+      EQUIPMENT_DATA.forEach(section => {
+        const normalItems = section.items.filter(item => {
+          const lock = isItemLocked(item.id);
+          const isBurningLocked =
+            lock.locked &&
+            lock.reason === "아이템 버닝 적용";
+
+          if (isBurningLocked) {
+            specialItems.push({ ...item, lockReason: lock.reason });
+            return false;
+          }
+          return shouldShow(item);
+        });
+
+        if (!normalItems.length) return;
+        count += normalItems.length;
+        container.appendChild(renderSection(section.category, normalItems, false));
+      });
+
+      const visibleSpecial = specialItems.filter(shouldShow);
+      if (visibleSpecial.length) {
+        count += visibleSpecial.length;
+        container.appendChild(renderSection(
+          "적용 중인 특수 장비",
+          visibleSpecial,
+          true,
+          "자동 완료된 장비는 설정을 해제하면 기존 진행도로 돌아갑니다."
+        ));
+      }
+
+      document.getElementById("emptyState").style.display = count ? "none" : "block";
+      bindCriterionEvents();
+      bindRingModeEvents();
+      bindSeedLevelEvents();
+      updateSummary();
+    }
+
+    function renderSection(title, items, special = false, desc = "") {
+      const sectionEl = document.createElement("section");
+      sectionEl.className = `section${special ? " special" : ""}`;
+
+      const totals = items.reduce((acc, item) => {
+        const s = itemStats(item);
+        acc.done += s.done;
+        acc.total += s.total;
+        return acc;
+      }, { done: 0, total: 0 });
+
+      sectionEl.innerHTML = `
+        <div class="section-head">
+          <div>
+            <h2 class="section-title">${title}</h2>
+            ${desc ? `<div class="section-desc">${desc}</div>` : ""}
+          </div>
+          <div class="section-desc">${totals.done} / ${totals.total} 단계</div>
+        </div>
+        <div class="equipment-grid"></div>
+      `;
+
+      const grid = sectionEl.querySelector(".equipment-grid");
+      items.forEach(item => grid.appendChild(renderEquipment(item)));
+      return sectionEl;
+    }
+
+    function renderEquipment(item) {
+      const stats = itemStats(item);
+      const lock = isItemLocked(item.id);
+      const isPidomi = item.id === "pendant2" && state.settings.pidomi;
+      const currentRingMode = ringMode(item.id);
+      const isEventRing = isRing(item.id) && currentRingMode === "event";
+      const isSeedRing = isRing(item.id) && currentRingMode === "seed";
+      const isBurningItem =
+        ITEM_BURNING_IDS.includes(item.id) &&
+        state.settings.itemBurning &&
+        lock.locked &&
+        lock.reason === "아이템 버닝 적용";
+      const card = document.createElement("article");
+      card.className = `equipment-card${stats.complete ? " complete" : ""}${lock.locked ? " locked" : ""}`;
+
+      if (isBurningItem) {
+        card.innerHTML = `
+          <div class="equipment-top">
+            <div class="equipment-name">
+              <div class="equipment-icon">${displayIcon(item)}</div>
+              <div>
+                <strong>${displayName(item)}</strong>
+                <span class="equipment-meta">아이템 버닝 전용 장비</span>
+                <span class="lock-badge">교체 불가</span>
+              </div>
+            </div>
+            <div class="burning-status" aria-label="아이템 버닝 중">
+              <div class="burning-symbol">🔥</div>
+              <div class="burning-copy">
+                <strong>아이템 버닝 중</strong>
+                <span>도전자 아이템은 교체하거나 옵션 단계를 직접 조정할 수 없습니다.</span>
+              </div>
+            </div>
+          </div>
+        `;
+        return card;
+      }
+
+      const makeCriterionHtml = criterion => {
+        const applies = activeApplies(item).includes(criterion.key);
+
+        if (!applies) {
+          return `
+            <div class="criterion na">
+              <span class="criterion-type">${criterion.label}</span>
+              <span class="goal-label">적용 대상 아님</span>
+              <span class="goal-main">해당 없음</span>
+            </div>
+          `;
+        }
+
+        const stages = stagesFor(item.id, criterion.key);
+        const progress = getProgress(item.id, criterion.key);
+        const total = stages.length;
+        const tier = tierIndex(progress, total);
+        const statusText = criterionText(stages, progress);
+        const dots = stages.map((_, index) =>
+          `<span class="stage-dot${index < progress ? " done" : ""}"></span>`
+        ).join("");
+
+        return `
+          <div class="criterion ${TIER_CLASSES[tier]}"
+               data-item="${item.id}"
+               data-key="${criterion.key}"
+               data-progress="${progress}"
+               role="button"
+               tabindex="0">
+            <span class="criterion-type">${criterion.label} · ${TIER_NAMES[tier]}</span>
+            <span class="goal-label">${statusText.label}</span>
+            <span class="goal-main">${statusText.main}</span>
+            <span class="achieved">${statusText.achieved}</span>
+            ${progress > 0 ? `<button class="undo" type="button" title="한 단계 되돌리기">↶</button>` : ""}
+            <span class="stage-dots">${dots}</span>
+          </div>
+        `;
+      };
+
+      const ringOptionsHtml = isRing(item.id) ? `
+        <span class="ring-options">
+          <label class="ring-option${isEventRing ? " active" : ""}">
+            <input
+              class="ring-mode-input"
+              type="checkbox"
+              data-item="${item.id}"
+              data-mode="event"
+              ${isEventRing ? "checked" : ""}
+            >
+            이벤트링
+          </label>
+          <label class="ring-option${isSeedRing ? " active" : ""}">
+            <input
+              class="ring-mode-input"
+              type="checkbox"
+              data-item="${item.id}"
+              data-mode="seed"
+              ${isSeedRing ? "checked" : ""}
+            >
+            시드링
+          </label>
+        </span>
+      ` : "";
+
+      let criteriaHtml;
+      let criteriaClass = "";
+
+      if (isPidomi) {
+        const flameCriterion = criterionByKey("flame");
+        criteriaHtml = `
+          ${makeCriterionHtml(flameCriterion)}
+          <div class="pidomi-status" aria-label="피도미 사용 중">
+            <div class="burning-symbol">🟣</div>
+            <div class="burning-copy">
+              <strong>피도미 사용 중</strong>
+              <span>스타포스·잠재·에디잠재·주문서 강화는 고정이며 추옵만 조정할 수 있습니다.</span>
+            </div>
+          </div>
+        `;
+      } else if (isSeedRing) {
+        const progress = getProgress(item.id, "seedLevel");
+        criteriaClass = " ring-seed";
+        criteriaHtml = `
+          <div class="seed-level-panel">
+            <span class="seed-level-label">시드링 레벨</span>
+            <span class="seed-level-current">${progress > 0 ? `${progress}레벨` : "레벨 미선택"}</span>
+            <div class="seed-level-buttons">
+              ${[1, 2, 3, 4].map(level => `
+                <button
+                  class="seed-level-btn${progress === level ? " active" : ""}"
+                  type="button"
+                  data-item="${item.id}"
+                  data-level="${level}"
+                >${level}레벨</button>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      } else if (isEventRing) {
+        criteriaClass = " ring-event";
+        criteriaHtml = [
+          criterionByKey("potential"),
+          criterionByKey("additional")
+        ].map(makeCriterionHtml).join("");
+      } else {
+        criteriaHtml = CRITERIA.map(makeCriterionHtml).join("");
+      }
+
+      const modeBadge = isEventRing
+        ? `<span class="lock-badge">이벤트링</span>`
+        : isSeedRing
+          ? `<span class="lock-badge">시드링</span>`
+          : "";
+
+      card.innerHTML = `
+        <div class="equipment-top">
+          <div class="equipment-name">
+            <div class="equipment-icon">${displayIcon(item)}</div>
+            <div>
+              <div class="equipment-title-row">
+                <strong>${displayName(item)}</strong>
+                ${ringOptionsHtml}
+              </div>
+              <span class="equipment-meta">${stats.done} / ${stats.total} 단계</span>
+              ${isPidomi ? `<span class="lock-badge">추옵만 조정 가능</span>` : ""}
+              ${modeBadge}
+            </div>
+          </div>
+          <div>
+            <div class="criteria-grid${criteriaClass}">${criteriaHtml}</div>
+            ${!isPidomi && !isSeedRing && activeApplies(item).includes("additional") ? `
+              <div class="additional-help">
+                <strong>공·마 10</strong> = 1줄 ·
+                <strong>주스탯 4%</strong> = 1줄 ·
+                <strong>주스탯 2%</strong> = 0.5줄
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    function bindCriterionEvents() {
+      document.querySelectorAll(".criterion:not(.na):not(.locked)").forEach(el => {
+        const advance = () => {
+          const itemId = el.dataset.item;
+          const key = el.dataset.key;
+          const stages = stagesFor(itemId, key);
+          const current = getProgress(itemId, key);
+
+          if (current >= stages.length) {
+            showToast("이미 최종 목표를 달성했습니다.");
+            return;
+          }
+
+          setProgress(itemId, key, current + 1);
+          saveState();
+          render();
+
+          const next = current + 1 < stages.length
+            ? `다음 목표: ${stages[current + 1]}`
+            : "최종 목표 달성!";
+          showToast(next);
+        };
+
+        el.addEventListener("click", event => {
+          if (event.target.closest(".undo")) return;
+          advance();
+        });
+
+        el.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            advance();
+          }
+        });
+
+        el.querySelector(".undo")?.addEventListener("click", event => {
+          event.stopPropagation();
+          const itemId = el.dataset.item;
+          const key = el.dataset.key;
+          setProgress(itemId, key, getProgress(itemId, key) - 1);
+          saveState();
+          render();
+          showToast("한 단계 되돌렸습니다.");
+        });
+      });
+    }
+
+    function bindRingModeEvents() {
+      document.querySelectorAll(".ring-mode-input").forEach(input => {
+        input.addEventListener("change", event => {
+          const itemId = event.target.dataset.item;
+          const selectedMode = event.target.dataset.mode;
+          const nextMode = event.target.checked ? selectedMode : "normal";
+
+          setRingMode(itemId, nextMode);
+          saveState();
+          render();
+
+          const label =
+            nextMode === "event" ? "이벤트링" :
+            nextMode === "seed" ? "시드링" : "일반 반지";
+
+          showToast(`${displayName(findItem(itemId))}을(를) ${label}으로 설정했습니다.`);
+        });
+      });
+    }
+
+    function bindSeedLevelEvents() {
+      document.querySelectorAll(".seed-level-btn").forEach(button => {
+        button.addEventListener("click", () => {
+          const itemId = button.dataset.item;
+          const level = Number(button.dataset.level);
+          const current = getProgress(itemId, "seedLevel");
+
+          setProgress(itemId, "seedLevel", current === level ? 0 : level);
+          saveState();
+          render();
+
+          showToast(
+            current === level
+              ? "시드링 레벨 선택을 해제했습니다."
+              : `시드링 ${level}레벨로 설정했습니다.`
+          );
+        });
+      });
+    }
+
+    function renderToggles() {
+      document.getElementById("itemBurningToggle").classList.toggle("active", state.settings.itemBurning);
+      document.getElementById("liberationToggle").classList.toggle("active", state.settings.liberated);
+      document.getElementById("pidomiToggle").classList.toggle("active", state.settings.pidomi);
+    }
+
+    function toggleItemBurning() {
+      if (!state.settings.itemBurning) {
+        state.backups.itemBurning = {};
+        ITEM_BURNING_IDS.forEach(id => {
+          const forceChallenger = id === "weapon";
+          state.backups.itemBurning[id] = snapshotItem(id, forceChallenger);
+          completeItem(id, forceChallenger);
+        });
+        state.settings.itemBurning = true;
+        showToast("도전자 무기와 방어구를 아이템 버닝 상태로 고정했습니다.");
+      } else {
+        ITEM_BURNING_IDS.forEach(id =>
+          restoreItem(id, state.backups.itemBurning[id], id === "weapon")
+        );
+        state.settings.itemBurning = false;
+        showToast("아이템 버닝 적용을 해제했습니다.");
+      }
+      saveState();
+      render();
+    }
+
+    function togglePidomi() {
+      state.settings.pidomi = !state.settings.pidomi;
+      saveState();
+      render();
+      showToast(
+        state.settings.pidomi
+          ? "펜던트 2를 피도미로 변경했습니다. 추옵만 조정할 수 있습니다."
+          : "피도미를 해제하고 일반 펜던트 슬롯으로 열었습니다."
+      );
+    }
+
+    function toggleLiberation() {
+      state.settings.liberated = !state.settings.liberated;
+
+      if (!state.settings.liberated && state.settings.itemBurning) {
+        completeItem("weapon", true);
+      }
+
+      saveState();
+      render();
+      showToast(
+        state.settings.liberated
+          ? "도전자 무기를 숨기고 해방무기 성장 슬롯을 열었습니다."
+          : state.settings.itemBurning
+            ? "도전자 무기를 아이템 버닝 고정 상태로 되돌렸습니다."
+            : "도전자 무기로 되돌렸습니다."
+      );
+    }
+
+    function updateSummary() {
+      let done = 0;
+      let total = 0;
+      let next = null;
+
+      allItems().forEach(item => {
+        activeApplies(item).forEach(key => {
+          const criterion = criterionByKey(key);
+          const stages = stagesFor(item.id, key);
+          const progress = getProgress(item.id, key);
+          done += progress;
+          total += stages.length;
+
+          if (!next && progress < stages.length && !isItemLocked(item.id).locked) {
+            next = {
+              item: displayName(item),
+              type: criterion.label,
+              goal: stages[progress]
+            };
+          }
+        });
+      });
+
+      const percent = total ? Math.round(done / total * 100) : 0;
+      document.getElementById("overallPercent").textContent = `${percent}%`;
+      document.getElementById("overallBar").style.width = `${percent}%`;
+      document.getElementById("milestoneCount").textContent = `${done} / ${total}`;
+      document.getElementById("overallDesc").textContent =
+        percent === 100 ? "모든 세부 목표를 최종 달성했습니다." : `${total - done}단계가 남았습니다.`;
+
+      document.getElementById("nextItem").textContent = next ? next.item : "완료!";
+      document.getElementById("nextGoal").textContent = next
+        ? `${next.type}: ${next.goal}`
+        : "설정된 모든 목표를 달성했습니다.";
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1700);
+    }
+
+    document.getElementById("itemBurningToggle").addEventListener("click", toggleItemBurning);
+    document.getElementById("liberationToggle").addEventListener("click", toggleLiberation);
+    document.getElementById("pidomiToggle").addEventListener("click", togglePidomi);
+
+    document.querySelectorAll(".filter-btn").forEach(button => {
+      button.addEventListener("click", () => {
+        currentFilter = button.dataset.filter;
+        document.querySelectorAll(".filter-btn").forEach(x => x.classList.remove("active"));
+        button.classList.add("active");
+        render();
+      });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!confirm("모든 진행 단계와 특수 장비 설정을 초기화할까요?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      LEGACY_STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+      const fresh = defaultState();
+      state.settings = fresh.settings;
+      state.progress = fresh.progress;
+      state.ringModes = fresh.ringModes;
+      state.backups = fresh.backups;
+      enforceLockedModes();
+      render();
+      showToast("전체 내용을 초기화했습니다.");
+    });
+
+    render();
+  </script>
+</body>
+</html>
